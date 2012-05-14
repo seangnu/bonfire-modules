@@ -30,7 +30,7 @@ class Migrate_model extends CI_Model {
      * Returns the whole news table as array.
      *
      * @param object $db database connection
-     * @return array news table
+     * @return array the table
      */
     public function get_news($db)
     {
@@ -38,14 +38,36 @@ class Migrate_model extends CI_Model {
     }
 
     /**
+     * Returns the whole news category table as array.
+     *
+     * @param object $db database connection
+     * @return array the table
+     */
+    public function get_news_categories($db)
+    {
+		return $db->get('news_cat')->result_array();
+    }
+
+    /**
      * Returns the whole articles table as array.
      *
      * @param object $db database connection
-     * @return array articles table
+     * @return array the table
      */
     public function get_articles($db)
     {
 		return $db->get('articles')->result_array();
+    }
+
+    /**
+     * Returns the whole articles category table as array.
+     *
+     * @param object $db database connection
+     * @return array the table
+     */
+    public function get_articles_categories($db)
+    {
+		return $db->get('articles_cat')->result_array();
     }
 
     /**
@@ -59,11 +81,27 @@ class Migrate_model extends CI_Model {
         foreach($news as $n)
         {
             $slug = $this->_mkslug($n['news_title'], 'news', 'news_slug');
-            $item = array('news_title' => $n['news_title'], 'news_text' => $n['news_text'], 'news_slug' => $slug);
+            $item = array('news_title' => $n['news_title'], 'news_text' => $n['news_text'], 'category_id' => $n['cat_id'], 'news_slug' => $slug, 'created_on' => $this->_get_time($n['news_date']));
             $this->db->insert('news', $item);
             
             $route = array('old' => $n['news_id'], 'slug' => $slug);
             $this->db->insert('reroute', $route);
+
+        }
+    }
+
+    /**
+     * Writes all the news categories.
+     *
+     * @param array $news_categories news categories table
+     * @return void
+     */
+    public function set_news_categories($news_categories)
+    {
+        foreach($news_categories as $n)
+        {
+            $item = array('id' => $n['cat_id'], 'category_name' => $n['cat_name'], 'category_description' => $n['cat_description']);
+            $this->db->insert('news_categories', $item);
         }
     }
 
@@ -78,7 +116,7 @@ class Migrate_model extends CI_Model {
         foreach($articles as $a)
         {
             $slug = $this->_mkslug($a['article_title'], 'pages', 'pages_slug');
-            $item = array('pages_title' => $a['article_title'], 'pages_text' => $a['article_text'], 'pages_slug' => $slug);
+            $item = array('pages_title' => $a['article_title'], 'pages_text' => $a['article_text'], 'category_id' => $a['article_cat_id'], 'pages_slug' => $slug, 'created_on' => $this->_get_time($a['article_date']));
             $this->db->insert('pages', $item);
             
             if( ! $a['article_url'] == NULL)
@@ -89,6 +127,25 @@ class Migrate_model extends CI_Model {
         }
     }
 
+    /**
+     * Writes all the pages categories.
+     *
+     * @param array $articles_categories news categories table
+     * @return void
+     */
+    public function set_pages_categories($articles_categories)
+    {
+        foreach($articles_categories as $n)
+        {
+            $item = array('id' => $n['cat_id'], 'category_name' => $n['cat_name'], 'category_description' => $n['cat_description']);
+            $this->db->insert('pages_categories', $item);
+        }
+    }
+    private function _get_time($timestamp)
+    {
+        $d = getdate($timestamp);
+        return $d['year'].'-'.$d['mon'].'-'.$d['mday'];
+    }
     /**
      * Returns an free slug.
      *

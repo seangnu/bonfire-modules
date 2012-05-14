@@ -98,6 +98,8 @@ class developer extends Admin_Controller {
         }
         unset($n);
         $this->migrate_model->set_news($news);
+        $news_categories = $this->migrate_model->get_news_categories($database_connection);
+        $this->migrate_model->set_news_categories($news_categories);
         redirect('admin/developer/migrate/check_connection');
     }
 
@@ -118,6 +120,8 @@ class developer extends Admin_Controller {
         }
         unset($a);
         $this->migrate_model->set_pages($articles);
+        $articles_categories = $this->migrate_model->get_articles_categories($database_connection);
+        $this->migrate_model->set_pages_categories($articles_categories);
         redirect('admin/developer/migrate/check_connection');
     }
 
