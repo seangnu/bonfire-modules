@@ -34,7 +34,7 @@ class Migrate_model extends CI_Model {
      */
     public function get_news($db)
     {
-		return $db->get('news')->result_array();
+        return $db->get('news')->result_array();
     }
 
     /**
@@ -45,7 +45,7 @@ class Migrate_model extends CI_Model {
      */
     public function get_news_categories($db)
     {
-		return $db->get('news_cat')->result_array();
+        return $db->get('news_cat')->result_array();
     }
 
     /**
@@ -56,7 +56,7 @@ class Migrate_model extends CI_Model {
      */
     public function get_articles($db)
     {
-		return $db->get('articles')->result_array();
+        return $db->get('articles')->result_array();
     }
 
     /**
@@ -67,7 +67,7 @@ class Migrate_model extends CI_Model {
      */
     public function get_articles_categories($db)
     {
-		return $db->get('articles_cat')->result_array();
+        return $db->get('articles_cat')->result_array();
     }
 
     /**

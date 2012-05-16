@@ -2,19 +2,19 @@
 
 class developer extends Admin_Controller {
 
-	public function __construct()
-	{
-		parent::__construct();
+    public function __construct()
+    {
+        parent::__construct();
 
-		$this->auth->restrict('Migrate.Developer.View');
-		$this->load->model('migrate_model', null, true);
-	}
-	
+        $this->auth->restrict('Migrate.Developer.View');
+        $this->load->model('migrate_model', null, true);
+    }
 
-	public function index()
-	{
-		Template::render();
-	}
+
+    public function index()
+    {
+        Template::render();
+    }
 
     /**
      * Check database connection and display open migration steps
@@ -92,11 +92,14 @@ class developer extends Admin_Controller {
         $database_config = $this->_get_database_config();
         $database_connection = $this->_get_database_connection($database_config);
         $news = $this->migrate_model->get_news($database_connection);
+        
+        $n = array();
         foreach($news as &$n)
         {
             $n['news_text'] = $this->_parse_fscode($n['news_text']);
         }
         unset($n);
+        
         $this->migrate_model->set_news($news);
         $news_categories = $this->migrate_model->get_news_categories($database_connection);
         $this->migrate_model->set_news_categories($news_categories);
@@ -114,11 +117,14 @@ class developer extends Admin_Controller {
         $database_config = $this->_get_database_config();
         $database_connection = $this->_get_database_connection($database_config);
         $articles = $this->migrate_model->get_articles($database_connection);
+        
+        $a = array();
         foreach($articles as &$a)
         {
             $a['article_text'] = $this->_parse_fscode($a['article_text']);
         }
         unset($a);
+        
         $this->migrate_model->set_pages($articles);
         $articles_categories = $this->migrate_model->get_articles_categories($database_connection);
         $this->migrate_model->set_pages_categories($articles_categories);
@@ -131,15 +137,8 @@ class developer extends Admin_Controller {
      * @return bool
      */
     private function _keep_database_config()
-    {
-        if( $this->input->post('hostname') === ""
-            || $this->input->post('username') === ""
-            || $this->input->post('password') === ""
-            || $this->input->post('database') === "")
-        {
-            return FALSE;
-        }
-
+    {      
+        $db = array();
         $db['hostname'] = $this->input->post('hostname');
         $db['username'] = $this->input->post('username');
         $db['password'] = $this->input->post('password');

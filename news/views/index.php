@@ -6,4 +6,4 @@
 		<?php endforeach; ?>
 <?php endif; ?>
 <br><br>
-<?php echo $pagination_links ?>
+<div class="pagination"><?php echo $pagination_links ?></div>

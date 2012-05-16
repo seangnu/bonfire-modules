@@ -8,6 +8,13 @@ if( isset($pages) ) {
 	$pages = (array)$pages;
 }
 $id = isset($pages['id']) ? "/".$pages['id'] : '';
+
+$categories_array = array();
+foreach($categories as $c)
+{
+    $categories_array[$c->id] = $c->category_name;
+}
+
 ?>
 <?php echo form_open($this->uri->uri_string(), 'class="constrained ajax-form"'); ?>
 <?php if(isset($pages['id'])): ?><input id="id" type="hidden" name="id" value="<?php echo $pages['id'];?>"  /><?php endif;?>
@@ -23,15 +30,19 @@ $id = isset($pages['id']) ? "/".$pages['id'] : '';
 </div>
 
 <div>
-        <?php echo form_label(lang('pages_text'), 'pages_text'); ?>
-        <?php echo form_textarea( array( 'name' => 'pages_text', 'style' => 'width:40em;', 'id' => 'pages_text', 'value' => set_value('pages_text', isset($pages['pages_text']) ? $pages['pages_text'] : '') ) )?>
+    <?php echo form_label(lang('category'), 'category'); ?>
+    <?php echo form_dropdown('category', $categories_array, isset($pages['category_id']) ? $pages['category_id'] : ''); ?>
+</div>
+
+<div style="margin-left: 100px;">
+        <?php echo form_textarea( array( 'name' => 'page_text', 'id' => 'page_text', 'value' => set_value('page_text', isset($pages['pages_text']) ? $pages['pages_text'] : '') ) )?>
 
 
-<div class="text-center">
+<div class="submits">
 	<input type="submit" name="submit" value="<?php echo lang('pages_save'); ?>" /> or <?php echo anchor(SITE_AREA .'/content/pages', lang('pages_cancel')); ?>
 </div>
-<fieldset>
+<div class="text-right">
     <a class="button" id="delete-me" href="<?php echo site_url(SITE_AREA .'/content/pages/delete'. $id); ?>" onclick="return confirm('<?php echo lang('pages_delete_confirm'); ?>')"><?php echo lang('pages_delete_record'); ?></a>
-</fieldset>
+</div>
 <?php echo form_close(); ?>
 

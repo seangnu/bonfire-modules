@@ -2,17 +2,16 @@
 
 class pages extends Front_Controller {
 
-	public function __construct() 
-	{
-		parent::__construct();
+    public function __construct() 
+    {
+        parent::__construct();
 
-		$this->load->library('form_validation');
-		$this->form_validation->CI =& $this;
-		$this->load->model('pages_model', null, true);
-		$this->lang->load('pages');
-		
-		
-	}
+        $this->load->library('form_validation');
+        $this->form_validation->CI =& $this;
+        $this->load->model('pages_model', null, true);
+        $this->lang->load('pages');
+
+    }
 	
     public function view($slug = FALSE)
     {
