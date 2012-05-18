@@ -14,15 +14,16 @@
                 <?php if (isset($records) && is_array($records) && count($records)) : ?>
                 <?php foreach ($records as $record) : ?>
                 <div class="list-item with-icon" data-id="<?php echo $record->id ?>" data-category="<?php  if(isset($categories[$record->category_id -1]->category_name)) echo $categories[$record->category_id -1]->category_name ?>">
-                    &nbsp;
+                    <img src="<?php echo Template::theme_url('images/page.png') ?>" />
                     <p>
                         <b><?php echo $record->news_title ?></b><br />
-                        <span></span>
+                        <span><span><?php if(isset($record->category_id)) echo $categories[$record->category_id -1]->category_name; ?></span></span>
                     </p>
                 </div>
                 <?php endforeach; ?>
                 <?php endif; ?>
             </div>
+            <br /><br />
         </div>
     </div>
     <div id="content" class="view">

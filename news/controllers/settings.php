@@ -7,7 +7,7 @@ class settings extends Admin_Controller {
         parent::__construct();
         $this->load->model('news_model', null, true);
         $this->load->model('categories_model', null, true);
-        Template::set('toolbar_title', lang('TODO_news_settings'));
+        //Template::set('toolbar_title', lang('TODO_news_settings'));
         $this->lang->load('news');
         //TODO $this->auth->restrict('News.Settings.View');
     }

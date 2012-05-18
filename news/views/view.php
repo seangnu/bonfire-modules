@@ -1,7 +1,5 @@
-<?php if (isset($records) && count($records)) : ?>
-    <?php $record = (array)$records;?>
-    <?php if (isset($record['news_title']) && isset($record['news_text'])) : ?>
-			   <h2><?php echo $record['news_title']; ?></h2>
-                <?php echo $record['news_text']; ?>
-    <?php endif; ?>
+<?php if (isset($news->news_title) && isset($news->news_text)) : ?>
+    <h2><?php echo $news->news_title; ?></h2>
+    <?php echo nl2br($news->news_text); ?>
 <?php endif; ?>
+

@@ -4,9 +4,9 @@
 		<div class="panel-header list-search">
             <select id="category-filter" style="display: inline-block; max-width: 40%;">
                 <option value="0"><?php echo lang('pages_all_categories'); ?></option>
-			    <?php foreach ($categories as $c) : ?>
-				    <option><?php echo $c->category_name ?></option>
-			    <?php endforeach; ?>
+                <?php foreach ($categories as $c) : ?>
+                        <option><?php echo $c->category_name ?></option>
+                <?php endforeach; ?>
             </select>
             <?php render_search_box(); ?>
 		</div>
@@ -15,14 +15,15 @@
                 <?php if (isset($records) && is_array($records) && count($records)) : ?>
                     <?php foreach ($records as $record) : ?>
                         <div class="list-item with-icon" data-id="<?php echo $record->id ?>" data-category="<?php if(isset($categories[$record->category_id]->category_name)) echo $categories[$record->category_id -1]->category_name ?>">
-                        &nbsp;&nbsp;
+                        <img src="<?php echo Template::theme_url('images/page.png'); ?>" />
                         <p>
                             <b><?php echo $record->pages_title ?></b><br />
-                            <span></span>
+                            <span><?php if(isset($record->category_id)) echo $categories[$record->category_id -1]->category_name; ?></span>
                         </p>
                     </div>
                     <?php endforeach; ?>
                 <?php endif; ?>
+                <br /><br />
             </div>
         </div>
     </div>

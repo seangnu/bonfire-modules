@@ -81,7 +81,7 @@ class Migrate_model extends CI_Model {
         foreach($news as $n)
         {
             $slug = $this->_mkslug($n['news_title'], 'news', 'news_slug');
-            $item = array('news_title' => $n['news_title'], 'news_text' => $n['news_text'], 'category_id' => $n['cat_id'], 'news_slug' => $slug, 'created_on' => $this->_get_time($n['news_date']));
+            $item = array('news_title' => $n['news_title'], 'news_published' => $n['news_active'], 'news_text' => $n['news_text'], 'category_id' => $n['cat_id'], 'news_slug' => $slug, 'created_on' => $this->_get_time($n['news_date']));
             $this->db->insert('news', $item);
             
             $route = array('old' => $n['news_id'], 'slug' => $slug);
@@ -100,7 +100,8 @@ class Migrate_model extends CI_Model {
     {
         foreach($news_categories as $n)
         {
-            $item = array('id' => $n['cat_id'], 'category_name' => $n['cat_name'], 'category_description' => $n['cat_description']);
+            $slug = $this->_mkslug($n['cat_name'], 'news_categories', 'category_slug');
+            $item = array('id' => $n['cat_id'], 'category_slug' => $slug, 'category_name' => $n['cat_name'], 'category_description' => $n['cat_description']);
             $this->db->insert('news_categories', $item);
         }
     }
@@ -141,6 +142,13 @@ class Migrate_model extends CI_Model {
             $this->db->insert('pages_categories', $item);
         }
     }
+    
+    /**
+     * Convert Unix Timestamp to Bonfire datetime
+     * 
+     * @param int $timestamp
+     * @return string 
+     */
     private function _get_time($timestamp)
     {
         $d = getdate($timestamp);
@@ -166,12 +174,15 @@ class Migrate_model extends CI_Model {
         }
         
         while ($this->db->where($params)->get($tablename)->num_rows()) {
-            if (!preg_match ('/-{1}[0-9]+$/', $slug )) {
+            if (!preg_match ('/-{1}[0-9]+$/', $slug ))
+            {
                 $slug .= '-' . ++$i;
-            } else {
+            }
+            else
+            {
                 $slug = preg_replace ('/[0-9]+$/', ++$i, $slug );
             }
-            $params [$fieldname] = $slug;
+                $params[$fieldname] = $slug;
             }
         return $slug;
     }

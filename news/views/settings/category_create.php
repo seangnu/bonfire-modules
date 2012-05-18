@@ -16,7 +16,7 @@
     <?php echo form_label(lang('category_description'), 'category_name'); ?>
     <?php echo form_textarea( array( 'name' => 'category_description', 'id' => 'category_description', 'value' => set_value('category_description', isset($category->category_description) ? $category->category_description : '') ) )?>
 </div>
-<div class="text-center">
+<div class="submits">
     <input type="submit" name="submit" value="<?php echo lang('category_save'); ?>" /> <?php echo anchor(SITE_AREA .'/settings/news', lang('category_cancel')); ?>
 </div>
 <?php echo form_close(); ?>

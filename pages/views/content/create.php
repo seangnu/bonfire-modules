@@ -14,8 +14,22 @@ foreach($categories as $c)
 {
     $categories_array[$c->id] = $c->category_name;
 }
-
 ?>
+<script type="text/javascript">
+//<![CDATA[
+var editor = CKEDITOR.instances['page_text'];
+if (editor) { editor.destroy(true); }
+CKEDITOR.replace(page_text, {
+    width:1000,
+    height:400
+});
+
+function CKupdate(){
+    for ( instance in CKEDITOR.instances )
+        CKEDITOR.instances[instance].updateElement();
+}
+//]]>
+</script>
 <?php echo form_open($this->uri->uri_string(), 'class="constrained ajax-form"'); ?>
 <?php if(isset($pages['id'])): ?><input id="id" type="hidden" name="id" value="<?php echo $pages['id'];?>"  /><?php endif;?>
 <div>
@@ -34,12 +48,12 @@ foreach($categories as $c)
     <?php echo form_dropdown('category', $categories_array, isset($pages['category_id']) ? $pages['category_id'] : ''); ?>
 </div>
 
-<div style="margin-left: 100px;">
+<div style="margin-left: 50px;">
         <?php echo form_textarea( array( 'name' => 'page_text', 'id' => 'page_text', 'value' => set_value('page_text', isset($pages['pages_text']) ? $pages['pages_text'] : '') ) )?>
 
-
+</div>
 <div class="submits">
-	<input type="submit" name="submit" value="<?php echo lang('pages_save'); ?>" /> or <?php echo anchor(SITE_AREA .'/content/pages', lang('pages_cancel')); ?>
+	<input onClick="CKupdate();" type="submit" name="submit" value="<?php echo lang('pages_save'); ?>" /> or <?php echo anchor(SITE_AREA .'/content/pages', lang('pages_cancel')); ?>
 </div>
 <div class="text-right">
     <a class="button" id="delete-me" href="<?php echo site_url(SITE_AREA .'/content/pages/delete'. $id); ?>" onclick="return confirm('<?php echo lang('pages_delete_confirm'); ?>')"><?php echo lang('pages_delete_record'); ?></a>

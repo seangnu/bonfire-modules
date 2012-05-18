@@ -45,7 +45,6 @@ class content extends Admin_Controller {
                 }
         }
 
-        Assets::add_js($this->load->view('content/ckeditor_js', null, true), 'inline');
         Template::set('categories', $this->categories_model->find_all());
         Template::render();
     }
@@ -77,7 +76,6 @@ class content extends Admin_Controller {
                 }
             }
             
-            Assets::add_js($this->load->view('content/ckeditor_js', null, true), 'inline');
             Template::set('categories', $this->categories_model->find_all());
             Template::set('pages', $this->pages_model->find($id));
 
@@ -134,7 +132,7 @@ class content extends Admin_Controller {
                 $data['pages_slug']        = $this->_mkslug($this->input->post('pages_slug'));
             }
             
-            $data['page_text']        = $this->input->post('page_text');
+            $data['pages_text']        = $this->input->post('page_text');
 
             if ($type == 'insert')
             {

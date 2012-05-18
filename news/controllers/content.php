@@ -19,12 +19,11 @@ class content extends Admin_Controller {
      *
      * @return void
      */
-    public function index() 
+    public function index()
     {
-        Assets::add_js($this->load->view('content/js', null, true), 'inline');
-
         Template::set('records', $this->news_model->order_by('created_on', 'desc')->find_all());
         Template::set('categories', $this->categories_model->order_by('id', 'asc')->find_all());
+        Assets::add_js($this->load->view('content/js', null, true), 'inline');
         Template::render();
     }
 
@@ -33,26 +32,33 @@ class content extends Admin_Controller {
      *
      * @return void
      */
-    public function create() 
+    public function create()
     {
         $this->auth->restrict('News.Content.Create');
         
-        if ($this->input->post('submit'))
+        if ($this->input->post('save') || $this->input->post('publish'))
         {
-            if ($insert_id = $this->save_news())
+            if($this->input->post('publish'))
             {
-                    // Log the activity
-                    $this->activity_model->log_activity($this->auth->user_id(), lang('news_act_create_record').': ' . $insert_id . ' : ' . $this->input->ip_address(), 'news');
+                $insert_id = $this->save_news('insert', 0, array('news_published' => 1));
+            }
+            else
+            {
+                $insert_id = $this->save_news();
+            }
+            if ($insert_id)
+            {
+                // Log the activity
+                $this->activity_model->log_activity($this->auth->user_id(), lang('news_act_create_record').': ' . $insert_id . ' : ' . $this->input->ip_address(), 'news');
 
-                    Template::set_message(lang("news_create_success"), 'success');
-                    Template::redirect(SITE_AREA .'/content/news');
+                Template::set_message(lang("news_create_success"), 'success');
+                Template::redirect(SITE_AREA .'/content/news');
             }
             else 
             {
-                    Template::set_message(lang('news_create_failure') . $this->news_model->error, 'error');
+                Template::set_message(lang('news_create_failure') . $this->news_model->error, 'error');
             }
         }
-        Assets::add_js($this->load->view('content/ckeditor_js', null, true), 'inline');
         Template::set('categories', $this->categories_model->order_by('id', 'asc')->find_all());
         Template::set('toolbar_title', lang('news_create') . ' news');
         Template::render();
@@ -63,37 +69,44 @@ class content extends Admin_Controller {
      *
      * @return void
      */
-    public function edit() 
+    public function edit()
     {
         $this->auth->restrict('News.Content.Edit');
 
         $id = (int)$this->uri->segment(5);
-
         if (empty($id))
         {
-                Template::set_message('news_invalid_id', 'error');
-                redirect(SITE_AREA .'/content/news');
+            Template::set_message('news_invalid_id', 'error');
+            redirect(SITE_AREA .'/content/news');
         }
 
-        if ($this->input->post('submit'))
+        if ($this->input->post('save') || $this->input->post('publish'))
         {
-            if ($this->save_news('update', $id))
+            if($this->input->post('publish'))
             {
-                    // Log the activity
-                    $this->activity_model->log_activity($this->auth->user_id(), lang('news_act_edit_record').': ' . $id . ' : ' . $this->input->ip_address(), 'news');
+                $return = $this->save_news('update', $id, array('news_published' => 1));
+            }
+            else
+            {
+                $return = $this->save_news('update', $id);
+            }
+            
+            if ($return)
+            {
+                // Log the activity
+                //$this->activity_model->log_activity($this->auth->user_id(), lang('news_act_edit_record').': ' . $id . ' : ' . $this->input->ip_address(), 'news');
 
-                    Template::set_message(lang('news_edit_success'), 'success');
+                Template::set_message(lang('news_edit_success'), 'success');
             }
             else 
             {
-                    Template::set_message(lang('news_edit_failure') . $this->news_model->error, 'error');
+                Template::set_message(lang('news_edit_failure') . $this->news_model->error, 'error');
             }
         }
-        Assets::add_js($this->load->view('content/ckeditor_js', null, true), 'inline');
         Template::set('news', $this->news_model->find($id));
         Template::set('categories', $this->categories_model->order_by('id', 'asc')->find_all());
         Template::set('toolbar_title', lang('news_edit') . ' news');
-        Template::render();		
+        Template::render();
     }
 
     /**
@@ -111,13 +124,13 @@ class content extends Admin_Controller {
         {	
             if ($this->news_model->delete($id))
             {
-                    // Log the activity
-                    $this->activity_model->log_activity($this->auth->user_id(), lang('news_act_delete_record').': ' . $id . ' : ' . $this->input->ip_address(), 'news');
+                // Log the activity
+                $this->activity_model->log_activity($this->auth->user_id(), lang('news_act_delete_record').': ' . $id . ' : ' . $this->input->ip_address(), 'news');
 
-                    Template::set_message(lang('news_delete_success'), 'success');
+                Template::set_message(lang('news_delete_success'), 'success');
             } else
             {
-                    Template::set_message(lang('news_delete_failure') . $this->news_model->error, 'error');
+                Template::set_message(lang('news_delete_failure') . $this->news_model->error, 'error');
             }
         }
 
@@ -129,7 +142,7 @@ class content extends Admin_Controller {
      *
      * @return bool
      */
-    private function save_news($type='insert', $id=0) 
+    private function save_news($type='insert', $id = 0, $data = NULL)
     {
 
         $this->form_validation->set_rules('news_title','Title','required|max_length[255]');			
@@ -142,10 +155,9 @@ class content extends Admin_Controller {
                 return FALSE;
         }
 
-        $data = array();
         $data['news_title']       = $this->input->post('news_title');
 
-        if($this->input->post('news_slug') == "")#
+        if($this->input->post('news_slug') == "")
         {
             $data['news_slug']        = $this->_mkslug($this->input->post('news_title'));
         }
@@ -155,26 +167,34 @@ class content extends Admin_Controller {
         }
      
         $data['news_text']        = $this->input->post('news_text');
-        $data['news_text']        = $this->input->post('news_text');
         $data['category_id']      = $this->input->post('category');
-        
+
+
+        if($this->input->post('news_published'))
+        {
+            $data['news_published'] = 1;
+        }
+        if( ! isset($data['news_published']))
+        {
+            $data['news_published'] = 0;
+        }
 
         if ($type == 'insert')
         {
-                $id = $this->news_model->insert($data);
+            $id = $this->news_model->insert($data);
 
-                if (is_numeric($id))
-                {
-                        return $id;
-                }
-                else
-                {
-                        return FALSE;
-                }
+            if (is_numeric($id))
+            {
+                return $id;
+            }
+            else
+            {
+                return FALSE;
+            }
         }
         else if ($type == 'update')
         {
-                return $this->news_model->update($id, $data);
+            return $this->news_model->update($id, $data);
         }
 
         return FALSE;
