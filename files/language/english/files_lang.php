@@ -1,0 +1,41 @@
+<?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
+
+// content
+$lang['files_all_categories']       = 'All categories';
+$lang['files_add_new']              = 'Add a new file.';
+$lang['files_new']                  = 'New';
+$lang['files_add_new_button']       = 'Add';
+$lang['files_select_file']          = 'Select File';
+$lang['files_file_title']           = 'File title';
+$lang['files_file_description']     = 'File description';
+$lang['files_file_category']        = 'Category';
+$lang['files_cancel']               = 'Cancel';
+$lang['files_name']                 = 'Filename';
+$lang['files_filter_all']           = 'All';
+$lang['files_filter_published']     = 'Published';
+$lang['files_filter_unpublished']   = 'Unpublished';
+$lang['files_filter_category']      = 'Category';
+$lang['files_id']                   = 'ID';
+$lang['files_title']                = 'Title';
+$lang['files_created_on']           = 'Created on';
+$lang['files_status']               = 'Status';
+$lang['files_action_publish']       = 'Publish';
+$lang['files_action_unpublish']     = 'Unpublish';
+$lang['files_published']            = 'Published';
+$lang['files_unpublished']          = 'Unpublished';
+$lang['files_nothing_found']        = 'No files found.';
+$lang['files_do_search']            = 'Search';
+$lang['files_manage']               = 'Manage files';
+$lang['files']                      = 'Files';
+$lang['files_create']               = 'Create';
+$lang['files_save_button']          = 'Save';
+//// settings
+$lang['files_per_page']             = 'Files per page';
+$lang['files_settings_save']        = 'Save settings';
+$lang['category_categories']        = 'Categories';
+$lang['category_list']              = 'List of all Categories';
+$lang['category_name']              = 'Name';
+$lang['category_description']       = 'Description';
+$lang['category_edit']              = 'Edit';
+$lang['category_create_new']        = 'Create new category';
+$lang['category']                   = 'Category';
