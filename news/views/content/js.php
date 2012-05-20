@@ -1,18 +1,12 @@
-$.subscribe('list-view/list-item/click', function(id) {
-	$('#content').load('<?php echo site_url(SITE_AREA .'/content/news/edit') ?>/'+ id);
+var editor = CKEDITOR.instances['news_text'];
+if (editor) { editor.destroy(true); }
+CKEDITOR.replace(news_text, {
+    extraPlugins : 'autogrow',
+    autoGrow_maxHeight : 300,
+    removePlugins : 'resize',
 });
 
-/*
-	Category Filter
-*/
-$('#category-filter').change(function(){
-	
-	var category = $(this).val();
-	
-	$('#news-list .list-item').css('display', 'block');
-	
-	if (category != '0')
-	{
-		$('#news-list .list-item[data-category!="'+ category +'"]').css('display', 'none');
-	}
-});
+function CKupdate(){
+    for ( instance in CKEDITOR.instances )
+        CKEDITOR.instances[instance].updateElement();
+}

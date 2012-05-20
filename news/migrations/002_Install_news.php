@@ -12,8 +12,9 @@ class Migration_Install_news extends Migration {
         $this->dbforge->add_field("`news_text` TEXT NOT NULL");
         $this->dbforge->add_field("`news_published` tinyint(1)");
         $this->dbforge->add_field("`category_id` int(11)");
-        $this->dbforge->add_field("`created_on` date");
-        $this->dbforge->add_field("`modified_on` date");
+        $this->dbforge->add_field("`created_on` DATETIME");
+        $this->dbforge->add_field("`modified_on` DATETIME");
+        $this->dbforge->add_field("`deleted` tinyint(1)");
         $this->dbforge->add_key('id', true);
         $this->dbforge->create_table('news');
 
