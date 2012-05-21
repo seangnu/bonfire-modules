@@ -10,21 +10,17 @@
     </div>'; */ }
     //echo '<div class="box">Die Anzeige der noch offenen Schritte ist sessionbasiert und überprüft nicht ob die Daten bereits in der Vergangenheit übertragen wurden!</div>';
     if( ! $news_copied) { echo '
-    <div class="box create rounded">
-
-        <a class="button good" href="'.site_url(SITE_AREA.'/developer/migrate/copy_news').'">Übertrage News</a>
         <h3>'.$news_count.' News können übertragen werden</h3>
-        <br>
-
-    </div>'; }
+        <div class="form-actions">
+            <a class="btn btn-success" href="'.site_url(SITE_AREA.'/developer/migrate/copy_news').'">Übertrage News</a>
+        </div>'; }
     if( ! $articles_copied) { echo '
-    <div class="box create rounded">
 
-        <a class="button good" href="'.site_url(SITE_AREA.'/developer/migrate/copy_articles').'">Übertrage Artikel</a>
         <h3>'.$articles_count.' Artikel können übertragen werden</h3>
-        <br>
-
-    </div>'; }
+        <div class="form-actions">
+            <a class="btn btn-success" href="'.site_url(SITE_AREA.'/developer/migrate/copy_articles').'">Übertrage Artikel</a>
+        </div>
+        '; }
 }
 else
 {

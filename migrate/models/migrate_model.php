@@ -81,7 +81,7 @@ class Migrate_model extends CI_Model {
         foreach($news as $n)
         {
             $slug = $this->_mkslug($n['news_title'], 'news', 'news_slug');
-            $item = array('news_title' => $n['news_title'], 'news_published' => $n['news_active'], 'news_text' => $n['news_text'], 'category_id' => $n['cat_id'], 'news_slug' => $slug, 'created_on' => $this->_get_time($n['news_date']));
+            $item = array('deleted' => 0, 'news_title' => $n['news_title'], 'news_published' => $n['news_active'], 'news_text' => $n['news_text'], 'category_id' => $n['cat_id'], 'news_slug' => $slug, 'created_on' => $this->_get_time($n['news_date']));
             $this->db->insert('news', $item);
             
             $route = array('old' => $n['news_id'], 'slug' => $slug);
@@ -152,7 +152,7 @@ class Migrate_model extends CI_Model {
     private function _get_time($timestamp)
     {
         $d = getdate($timestamp);
-        return $d['year'].'-'.$d['mon'].'-'.$d['mday'];
+        return $d['year'].'-'.$d['mon'].'-'.$d['mday'].' '.$d['hours'].':'.$d['minutes'].':'.$d['seconds'];
     }
     /**
      * Returns an free slug.
