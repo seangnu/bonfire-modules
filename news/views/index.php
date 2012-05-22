@@ -9,7 +9,7 @@
         </div>
         <div class="item-foot news-foot">
             <span class="news-date"><?php echo date('M j, y g:i A', strtotime($n->created_on)); ?></span>
-            <span class="news-category"><?php if($n->category_id) : ?><?php echo lang('category').': ';?><a href="<?php echo site_url('news/category/'.$categories[$n->category_id -1]->category_slug) ; ?>"><?php echo $categories[$n->category_id -1]->category_name ; ?></a><?php endif; ?></span>
+            <span class="news-category"><?php if($n->category_id) : ?><?php echo lang('news_category').': ';?><a href="<?php echo site_url('news/category/'.$categories[$n->category_id -1]->category_slug) ; ?>"><?php echo $categories[$n->category_id -1]->category_name ; ?></a><?php endif; ?></span>
         </div>
     </div>
     <?php endforeach; ?>

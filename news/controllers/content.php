@@ -6,12 +6,11 @@ class content extends Admin_Controller {
     {
         parent::__construct();
 
-        $this->auth->restrict('News.Content.View');
         $this->load->model('news_model', null, true);
         $this->load->model('categories_model', null, true);
-        $this->lang->load('news');
+        $this->lang->load('news_backend');
         $this->load->helper('slug_helper');
-        Template::set('toolbar_title', lang('news_manage'));
+        Template::set('toolbar_title', lang('news_subnav_heading'));
         Template::set_block('sub_nav', 'content/sub_nav');
     }
     
@@ -22,25 +21,26 @@ class content extends Admin_Controller {
      */
     public function index($page = 0)
     {
+        $this->auth->restrict('News.Content.View');
+        
         $limit = 15;
         $categories = $this->categories_model->find_all();
         $filter = $this->input->get('filter');
         
-        $where = array('news.deleted' => 0);
-        $show_deleted = FALSE;
+        $where = array('deleted' => 0);
         
         if($this->input->post('publish_selected'))
         {
             $this->_save_selected_news('publish', $this->input->post('checked')) ?
-                Template::set_message(lang('news_edit_success'), 'success') :
-                Template::set_message(lang('news_edit_failure') . $this->news_model->error, 'error');
+                Template::set_message(lang('news_publish_success'), 'success') :
+                Template::set_message(lang('news_publish_failure') . $this->news_model->error, 'error');
             
         }
         elseif($this->input->post('unpublish_selected'))
         {
             $this->_save_selected_news('unpublish', $this->input->post('checked')) ?
-                Template::set_message(lang('news_edit_success'), 'success') :
-                Template::set_message(lang('news_edit_failure') . $this->news_model->error, 'error');
+                Template::set_message(lang('news_unpublish_success'), 'success') :
+                Template::set_message(lang('news_unpublish_failure') . $this->news_model->error, 'error');
         }
         elseif($this->input->post('delete_selected'))
         {
@@ -51,31 +51,30 @@ class content extends Admin_Controller {
         elseif($this->input->post('purge_selected'))
         {
             $this->_save_selected_news('purge', $this->input->post('checked')) ?
-                Template::set_message(lang('news_delete_success'), 'success') :
-                Template::set_message(lang('news_delete_failure') . $this->news_model->error, 'error');
+                Template::set_message(lang('news_purge_success'), 'success') :
+                Template::set_message(lang('news_purge_failure') . $this->news_model->error, 'error');
         }
         elseif($this->input->post('restore_selected'))
         {
-            $this->_save_selected_news('restore', $this->input->post('checked')); /* ?
-                Template::set_message(lang('news_delete_success'), 'success') :
-                Template::set_message(lang('news_delete_failure') . $this->news_model->error, 'error'); */
+            $this->_save_selected_news('restore', $this->input->post('checked')) ?
+                Template::set_message(lang('news_restore_success'), 'success') :
+                Template::set_message(lang('news_restore_failure') . $this->news_model->error, 'error');
         }
 
         switch($filter)
         {
             case 'published':
-                $where['news.news_published'] = 1;
+                $where['news_published'] = 1;
                 break;
             case 'unpublished':
-                $where['news.news_published'] = 0;
+                $where['news_published'] = 0;
                 break;
             case 'deleted':
-                $where['news.deleted'] = 1;
-                $show_deleted = TRUE;
+                $where['deleted'] = 1;
                 break;
             case 'category':
                 $category_id = (int)$this->input->get('category_id');
-                $where['news.category_id'] = $category_id;
+                $where['category_id'] = $category_id;
 
                 foreach ($categories as $c)
                 {
@@ -86,38 +85,49 @@ class content extends Admin_Controller {
                     }
                 }
                 break;
-
             default:
-                #$where['news.deleted'] = 0;
-                #$this->news_model->where('nedeleted', 0);
                 break;
         }
         
-        Template::set('filter', $filter);
-        Template::set('current_url', current_url());
         
         $search_term = $this->input->post('search_term');
         if($search_term)
         {
             $this->news_model->likes('news_title', $search_term);
-            //$this->news_model->likes('news_text', $search_term);
+            $likes = TRUE;
+            $likes_field = 'news_title';
+            $likes_value = $search_term;
             Template::set('search_term', $search_term);
         }
         else
         {
+            $likes = FALSE;
             $this->news_model->limit($limit, $page);
         }
-        $this->news_model->where($where)->select('news.id, news_title, news_slug, category_id, news_published, created_on');
+        $this->news_model->where($where)->select('id, deleted, news_title, news_slug, category_id, news_published, created_on');
         $news = $this->news_model->order_by('id', 'desc')->find_all(FALSE);
         Template::set('news', $news);
+        
+        if($likes)
+        {
+            $count = $this->news_model->where($where)->select('id')->likes($likes_field, $likes_value)->count_all();
+        }
+        else
+        {
+            $count = $this->news_model->where($where)->select('id')->count_all();
+        }
+        
+        
         $this->load->library('pagination');
 	$this->pager['base_url'] = site_url(SITE_AREA .'/content/news/index');
-        $this->pager['total_rows'] = count($news);
+        $this->pager['total_rows'] = $count;
         $this->pager['per_page'] = $limit;
-        $this->pager['uri_segment']	= 5;
+        $this->pager['uri_segment'] = 5;
         $this->pagination->initialize($this->pager);
         
         Template::set('categories', $categories);
+        Template::set('filter', $filter);
+        Template::set('current_url', current_url());
         
         Template::render();
     }
@@ -128,7 +138,9 @@ class content extends Admin_Controller {
      * @return void
      */
     public function create()
-    {
+    {       
+        $this->auth->restrict('News.Content.Create');
+                
         if ($this->input->post('save') || $this->input->post('publish'))
         {
             if($this->input->post('publish'))
@@ -145,13 +157,8 @@ class content extends Admin_Controller {
                 Template::set_message(lang("news_create_success"), 'success');
                 Template::redirect(SITE_AREA .'/content/news');
             }
-            else 
-            {
-                Template::set_message(lang('news_create_failure') . $this->news_model->error, 'error');
-            }
         }
         Template::set('categories', $this->categories_model->order_by('id', 'asc')->find_all());
-        Template::set('toolbar_title', lang('news_create') . ' news');
         Assets::add_js(Template::theme_url('js/editors/ckeditor/ckeditor.js'));
         Assets::add_js($this->load->view('content/js', null, true), 'inline');
         Template::render();
@@ -164,6 +171,9 @@ class content extends Admin_Controller {
      */
     public function edit()
     {
+        $this->auth->restrict('News.Content.Edit');
+
+                
         $id = (int)$this->uri->segment(5);
         if (empty($id))
         {
@@ -184,17 +194,11 @@ class content extends Admin_Controller {
             
             if ($return)
             {
-
                 Template::set_message(lang('news_edit_success'), 'success');
-            }
-            else 
-            {
-                Template::set_message(lang('news_edit_failure') . $this->news_model->error, 'error');
             }
         }
         Template::set('news', $this->news_model->find($id));
         Template::set('categories', $this->categories_model->order_by('id', 'asc')->find_all());
-        Template::set('toolbar_title', lang('news_edit') . ' news');
         
         Assets::add_js(Template::theme_url('js/editors/ckeditor/ckeditor.js'));
         Assets::add_js($this->load->view('content/js', null, true), 'inline');
@@ -206,8 +210,10 @@ class content extends Admin_Controller {
      *
      * @return void
      */
-    public function delete($id = FALSE) 
-    {	
+    public function delete($id = FALSE)
+    {
+        $this->auth->restrict('News.Content.Edit');
+
         if ( ! empty($id) && $id)
         {	
             if ($this->news_model->delete($id))
@@ -229,15 +235,12 @@ class content extends Admin_Controller {
      */
     private function _save_news($type='insert', $id = 0, $data = NULL)
     {
-
-        $this->form_validation->set_rules('news_title','Title','required|max_length[255]');			
-        $this->form_validation->set_rules('news_slug','Slug','max_length[255]');			
-        $this->form_validation->set_rules('news_text','Text','');
-        $this->form_validation->set_rules('category','Category','');
-
+        $this->form_validation->set_rules('news_title','Title','required|max_length[255]');
+        $this->form_validation->set_rules('category_id','Category','required|integer|max_length[11]');
+        
         if ($this->form_validation->run() === FALSE)
         {
-                return FALSE;
+            return FALSE;
         }
 
         $data['news_title']       = $this->input->post('news_title');
@@ -328,6 +331,7 @@ class content extends Admin_Controller {
         }
         elseif($type == 'purge')
         {
+            $this->auth->restrict('News.Content.Delete');
             foreach($ids as $i)
             {
                 $this->news_model->set_soft_deletes(FALSE);

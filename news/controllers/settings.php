@@ -5,10 +5,11 @@ class settings extends Admin_Controller {
     public function __construct() 
     {
         parent::__construct();
+        $this->auth->restrict('News.Settings.Manage');
         $this->load->model('news_model', null, true);
         $this->load->model('categories_model', null, true);
-        $this->lang->load('news');
-        $this->auth->restrict('News.Settings.Manage');
+        $this->lang->load('news_backend');
+        Template::set('toolbar_title', lang('news_subnav_heading'));
     }
     
     
@@ -24,7 +25,6 @@ class settings extends Admin_Controller {
         Template::set('config', $config);
         Template::set('news_per_page_options', $news_per_page_options);
         Template::set('categories', $this->categories_model->order_by('id', 'asc')->find_all());
-        Template::set('toolbar_title', lang('news_settings'));
         Template::render();
     }
 
@@ -35,12 +35,12 @@ class settings extends Admin_Controller {
             $config = array();
             $config['news_per_page'] = $this->input->post('news_per_page');
             write_config('news', $config);
-            Template::set_message(lang('news_settings_save_success'), 'success');
+            Template::set_message(lang('news_action_save_settings_success'), 'success');
             Template::redirect(SITE_AREA .'/settings/news');
         }
         else
         {
-            Template::set_message(lang('news_settings_save_failed'), 'error');
+            Template::set_message(lang('news_action_save_settings_failed'), 'error');
             Template::redirect(SITE_AREA .'/settings/news');
         }
         
@@ -50,18 +50,12 @@ class settings extends Admin_Controller {
     {
         if ($this->input->post('submit'))
         {
-            if ($insert_id = $this->_save_category())
+            if ($this->_save_category())
             {
-                    
-                Template::set_message(lang('category_edit_success'), 'success');
+                Template::set_message(lang('news_create_category_success'), 'success');
                 Template::redirect(SITE_AREA .'/settings/news');
             }
-            else 
-            {
-                Template::set_message(lang('category_edit_failure'), 'error');
-            }
         }
-        Template::set('toolbar_title', lang('category_create'));
         Template::render();
     }
     
@@ -73,24 +67,20 @@ class settings extends Admin_Controller {
             $id = $this->input->post('id');
             if(empty($id))
             {
-                Template::set_message(lang('category_invalid_id'), 'error');
+                Template::set_message(lang('news_category_invalid_id'), 'error');
                 redirect(SITE_AREA .'/settings/news');
             }
         }
         
-        if ($this->input->post('submit') && $this->input->post('category_name'))
+        if ($this->input->post('submit') && $this->input->post('id'))
         {
             if ($this->_save_category('update', $id))
             {
-                Template::set_message('TODO_category_edit_success', 'success');
-            }
-            else 
-            {
-                Template::set_message('TODO_category_edit_failure', 'error');
+                Template::set_message(lang('news_save_category_success'), 'success');
+                redirect(SITE_AREA .'/settings/news');
             }
         }
         
-        Template::set('toolbar_title', lang('category_edit'));
         Template::set('category', $this->categories_model->find($id));
         Template::render();		
     }
@@ -103,8 +93,7 @@ class settings extends Admin_Controller {
     private function _save_category($type='insert', $id=0)
     {
         $this->load->helper('slug_helper');
-        $this->form_validation->set_rules('category_name','TODO_name','required|max_length[255]');	
-        $this->form_validation->set_rules('category_description','TODO_description','');
+        $this->form_validation->set_rules('category_name','','required|max_length[255]');	
         
         if ($this->form_validation->run() === FALSE)
         {

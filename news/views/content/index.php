@@ -25,7 +25,7 @@
         <li>
             <?php echo form_open($this->uri->uri_string(), array('class' => 'span4')); ?>
                 <input type="text" id="search_term" name="search_term" class="input-medium search-query" value="<?php if(isset($search_term)) echo $search_term; ?>">
-                <input type="submit" class="btn btn-primary" value="<?php echo lang('news_do_search'); ?>" />
+                <input type="submit" class="btn btn-primary" value="<?php echo lang('news_action_search'); ?>" />
             <?php echo form_close(); ?>
         </li>
     </ul>
@@ -37,7 +37,7 @@
                 <th style="width: 3em"><?php echo lang('news_id'); ?></th>
                 <th><?php echo lang('news_title'); ?></th>
                 <th style="width: 11em"><?php echo lang('news_slug'); ?></th>
-                <th style="width: 11em"><?php echo lang('category'); ?></th>
+                <th style="width: 11em"><?php echo lang('news_category'); ?></th>
                 <th style="width: 11em"><?php echo lang('news_created_on'); ?></th>
                 <th style="width: 10em"><?php echo lang('news_status'); ?></th>
             </tr>
@@ -46,14 +46,13 @@
         <tfoot>
             <tr>
                 <td colspan="7">
-                    <?php echo lang('news_with_selected') ?>
                     <?php if($filter == 'deleted'):?>
                         <input type="submit" name="restore_selected" class="btn btn-success" value="<?php echo lang('news_action_restore') ?>">
-                        <input type="submit" name="purge_selected" class="btn btn-danger" value="<?php echo lang('news_action_purge') ?>" onclick="return confirm('<?php echo lang('news_purge_confirm'); ?>')">
+                        <input type="submit" name="purge_selected" class="btn btn-danger" value="<?php echo lang('news_action_purge') ?>" onclick="return confirm('<?php echo lang('news_action_purge_confirm'); ?>')">
                     <?php else: ?>
-                    <input type="submit" name="publish_selected" class="btn" value="<?php echo lang('news_action_publish') ?>">
-                    <input type="submit" name="unpublish_selected" class="btn" value="<?php echo lang('news_action_unpublish') ?>">
-                    <input type="submit" name="delete_selected" class="btn btn-danger" id="delete-me" value="<?php echo lang('news_action_delete') ?>" onclick="return confirm('<?php echo lang('news_delete_confirm'); ?>')">
+                        <input type="submit" name="publish_selected" class="btn btn btn-success" value="<?php echo lang('news_action_publish') ?>">
+                        <input type="submit" name="unpublish_selected" class="btn btn-inverse" value="<?php echo lang('news_action_unpublish') ?>">
+                        <input type="submit" name="delete_selected" class="btn btn-danger" id="delete-me" value="<?php echo lang('news_action_delete') ?>" onclick="return confirm('<?php echo lang('news_action_delete_confirm'); ?>')">
                     <?php endif;?>
                 </td>
             </tr>
@@ -84,25 +83,36 @@
                     <td>
                         <?php
                         $class = '';
-                        switch ($n->news_published)
+                        if( ! $n->deleted)
                         {
-                            case 1:
-                                $class = " label-success";
-                                break;
-                            case 0:
-                                $class = " label";
-                                break;
+                            switch ($n->news_published)
+                            {
+                                case 1:
+                                    $class = " label-success";
+                                    break;
+                                case 0:
+                                    $class = " label";
+                                    break;
+                            }
+                        }
+                        else
+                        {
+                            $class = " label-important";
                         }
                         ?>
                         <span class="label<?php echo($class); ?>">
                         <?php
-                            if ($n->news_published == 1)
+                            if($n->deleted == 1)
                             {
-                                    echo(lang('news_published'));
+                                echo(lang('news_status_deleted'));
+                            }
+                            elseif ($n->news_published == 1)
+                            {
+                                    echo(lang('news_status_published'));
                             }
                             else
                             {
-                                    echo(lang('news_unpublished'));
+                                    echo(lang('news_status_unpublished'));
                             }
                         ?>
                         </span>

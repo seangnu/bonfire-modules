@@ -9,8 +9,7 @@ class news extends Front_Controller {
         $this->load->library('form_validation');
         $this->load->model('news_model', null, true);
         $this->load->model('categories_model', null, true);
-        //$this->lang->load('news_front');
-        $this->lang->load('news');
+        $this->lang->load('news_frontend');
     }
 	
     /**
