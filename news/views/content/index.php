@@ -23,7 +23,7 @@
             <?php endif; ?>
         </li>
         <li>
-            <?php echo form_open($this->uri->uri_string(), array('class' => 'span4')); ?>
+            <?php echo form_open($this->uri->uri_string()); ?>
                 <input type="text" id="search_term" name="search_term" class="input-medium search-query" value="<?php if(isset($search_term)) echo $search_term; ?>">
                 <input type="submit" class="btn btn-primary" value="<?php echo lang('news_action_search'); ?>" />
             <?php echo form_close(); ?>

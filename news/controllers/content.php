@@ -139,7 +139,7 @@ class content extends Admin_Controller {
      */
     public function create()
     {       
-        $this->auth->restrict('News.Content.Create');
+        $this->auth->restrict('News.Content.Edit');
                 
         if ($this->input->post('save') || $this->input->post('publish'))
         {
@@ -236,7 +236,7 @@ class content extends Admin_Controller {
     private function _save_news($type='insert', $id = 0, $data = NULL)
     {
         $this->form_validation->set_rules('news_title','Title','required|max_length[255]');
-        $this->form_validation->set_rules('category_id','Category','required|integer|max_length[11]');
+        $this->form_validation->set_rules('category','Category','required|integer|max_length[11]');
         
         if ($this->form_validation->run() === FALSE)
         {
