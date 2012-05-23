@@ -24,14 +24,21 @@ class Migration_Install_news extends Migration {
         $this->dbforge->add_field("`category_description` TEXT NOT NULL");
         $this->dbforge->add_key('id', true);
         $this->dbforge->create_table('news_categories');
+        
+        $this->dbforge->add_field('`id` int(11) NOT NULL AUTO_INCREMENT');
+        $this->dbforge->add_field("`news_id` int(11) NOT NULL");
+        $this->dbforge->add_field("`opcodes` TEXT");
+        $this->dbforge->add_key('id', true);
+        $this->dbforge->create_table('news_opcodes');
     }
 
     public function down()
     {
-    $prefix = $this->db->dbprefix;
+        $prefix = $this->db->dbprefix;
 
-    $this->dbforge->drop_table('news');
-    $this->dbforge->drop_table('news_categories');
+        $this->dbforge->drop_table('news');
+        $this->dbforge->drop_table('news_categories');
+        $this->dbforge->drop_table('news_opcodes');
     }
 
 }

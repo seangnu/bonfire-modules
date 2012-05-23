@@ -39,6 +39,7 @@ $lang['news_action_publish']                    = 'Publish';
 $lang['news_action_unpublish']                  = 'Unpublish';
 $lang['news_action_delete']                     = 'Delete';
 $lang['news_action_search']                     = 'Search';
+$lang['news_action_revisions']                  = 'Revisions';
 
 // Navigation
 $lang['news_subnav_heading']                    = 'News';
@@ -72,6 +73,10 @@ $lang['news_purge_success']			= 'News has been purged.';
 $lang['news_purge_failure']			= 'Problem occured while purging.';
 $lang['news_restore_success']			= 'News has been restored.';
 $lang['news_restore_failure']			= 'Problem occured while restoring.';
+
+$lang['news_restore_revision_success']          = 'Revision has been restored.';
+$lang['news_restore_revision_failure']		= 'Problem occured while restoring revision.';
+
 
 /*
  * SETTINGS

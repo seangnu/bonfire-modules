@@ -153,7 +153,6 @@ class content extends Admin_Controller {
             }
             if ($insert_id)
             {
-
                 Template::set_message(lang("news_create_success"), 'success');
                 Template::redirect(SITE_AREA .'/content/news');
             }
@@ -178,7 +177,7 @@ class content extends Admin_Controller {
         if (empty($id))
         {
             Template::set_message('news_invalid_id', 'error');
-            redirect(SITE_AREA .'/content/news');
+            Template::redirect(SITE_AREA .'/content/news');
         }
 
         if ($this->input->post('save') || $this->input->post('publish'))
@@ -197,7 +196,12 @@ class content extends Admin_Controller {
                 Template::set_message(lang('news_edit_success'), 'success');
             }
         }
-        Template::set('news', $this->news_model->find($id));
+        $news = $this->news_model->find($id);
+        if( ! $news)
+        {
+            show_404();
+        }
+        Template::set('news', $news);
         Template::set('categories', $this->categories_model->order_by('id', 'asc')->find_all());
         
         Assets::add_js(Template::theme_url('js/editors/ckeditor/ckeditor.js'));
@@ -214,7 +218,7 @@ class content extends Admin_Controller {
     {
         $this->auth->restrict('News.Content.Edit');
 
-        if ( ! empty($id) && $id)
+        if ( ! $id === FALSE)
         {	
             if ($this->news_model->delete($id))
             {
@@ -224,10 +228,89 @@ class content extends Admin_Controller {
                 Template::set_message(lang('news_delete_failure') . $this->news_model->error, 'error');
             }
         }
-
-        redirect(SITE_AREA .'/content/news');
+        Template::redirect(SITE_AREA .'/content/news');
+    }
+    
+    /*
+     * Display all revisions of a news
+     * 
+     * @param int $id The News ID.
+     */
+    public function revisions($id = FALSE)
+    {
+        $this->auth->restrict('News.Content.View');
+        $this->load->model('opcodes_model');
+        $this->load->library('news/finediff');
+        
+        $news = $this->news_model->find($id);
+        if( ! $news)
+        {
+            show_404();
+        }
+        Template::set('news', $news);
+        
+        $revisions = $this->opcodes_model->order_by('id', 'asc')->find_all_by('news_id', $id);
+        foreach($revisions as &$r)
+        {
+            $r->htmldiff = '';
+            foreach($revisions as $rev)
+            {
+                if($rev->id == $r->id)
+                {
+                    break;
+                }
+                $r->htmldiff = FineDiff::renderToTextFromOpcodes($r->htmldiff, $rev->opcodes);
+            }
+            $r->htmldiff = html_entity_decode(FineDiff::renderDiffToHTMLFromOpcodes($r->htmldiff, $r->opcodes));
+        }
+        unset($r);
+        
+        Template::set('revisions', $revisions);
+        Template::render();
     }
 
+    /**
+     * Restore a revision
+     * 
+     * @param int $id The Revision ID. 
+     */
+    
+    public function restore_revision($id)
+    {
+        $this->auth->restrict('News.Content.Edit');
+        $this->load->model('opcodes_model');
+        $this->load->library('news/finediff');
+        
+        $revision = $this->opcodes_model->find_by('id', $id);
+        if( ! $revision)
+        {
+            show_404();
+        }
+        $revisions = $this->opcodes_model->order_by('id', 'asc')->find_all_by('news_id', $revision->news_id);
+        $data = $this->news_model->find($revision->news_id);
+        $news_text = '';
+        foreach($revisions as $r)
+        {
+            $news_text = FineDiff::renderToTextFromOpcodes($news_text, $r->opcodes);
+            if($r->id == $revision->id)
+            {
+                break;
+            }
+        }
+        
+        $opcodes = FineDiff::getDiffOpcodes($data->news_text, $news_text);
+        $this->opcodes_model->insert(array('news_id' => $revision->news_id, 'opcodes' => $opcodes));
+        $data->news_text = $news_text;
+        
+        if ($this->news_model->update($revision->news_id, (array)$data))
+        {
+            Template::set_message(lang('news_restore_revision_success'), 'success');
+        } else
+        {
+            Template::set_message(lang('news_restore_revision_failure').$this->news_model->error, 'error');
+        }
+        Template::redirect(SITE_AREA .'/content/news/edit/'.$revision->news_id);
+    }
     /**
      * Save news to database
      *
@@ -242,7 +325,6 @@ class content extends Admin_Controller {
         {
             return FALSE;
         }
-
         $data['news_title']       = $this->input->post('news_title');
 
         if($this->input->post('news_slug') == "")
@@ -270,9 +352,14 @@ class content extends Admin_Controller {
         if ($type == 'insert')
         {
             $id = $this->news_model->insert($data);
-
+            
             if (is_numeric($id))
             {
+                // Save diff
+                $this->load->model('opcodes_model');
+                $this->load->library('news/finediff');
+                $opcodes = FineDiff::getDiffOpcodes('', $data['news_text']);
+                $this->opcodes_model->insert(array('news_id' => $id, 'opcodes' => $opcodes));
                 return $id;
             }
             else
@@ -280,8 +367,14 @@ class content extends Admin_Controller {
                 return FALSE;
             }
         }
-        else if ($type == 'update')
+        elseif ($type == 'update')
         {
+            // Save diff
+            $this->load->model('opcodes_model');
+            $old = $this->news_model->find($id);
+            $this->load->library('news/finediff');
+            $opcodes = FineDiff::getDiffOpcodes($old->news_text, $data['news_text']);
+            $this->opcodes_model->insert(array('news_id' => $id, 'opcodes' => $opcodes));
             return $this->news_model->update($id, $data);
         }
 

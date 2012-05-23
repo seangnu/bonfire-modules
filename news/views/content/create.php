@@ -27,12 +27,20 @@ if($categories)
         </div>
         <?php echo form_dropdown('category', $categories_array, $new ? '' : $news->category_id, lang('news_category')); ?>
         <?php echo form_textarea( array( 'name' => 'news_text',  'id' => 'news_text', 'value' => set_value('news_text', $new ? '' : $news->news_text) ) )?>
+        
         <div class="form-actions">
-            <input class="btn btn-primary" onClick="CKupdate();" type="submit" name="save" value="<?php echo lang('news_action_save'); ?>" /> <input class="btn btn-success" onClick="CKupdate();" type="submit" name="publish" value="<?php echo lang('news_action_publish'); ?>" />
-            <?php echo anchor(SITE_AREA .'/content/news', lang('news_action_cancel'), 'class="btn btn-warning"'); ?>
-            <?php if(! $new): ?>
-                 <a class="btn btn-danger" href="<?php echo site_url(SITE_AREA.'/content/news/delete/'.$news->id); ?>" onclick="return confirm('<?php echo lang('news_delete_confirm'); ?>')"><?php echo lang('news_action_delete') ?></a>
-            <?php endif;?>
+            <div class="span6">
+                <input class="btn btn-primary" onClick="CKupdate();" type="submit" name="save" value="<?php echo lang('news_action_save'); ?>" /> <input class="btn btn-success" onClick="CKupdate();" type="submit" name="publish" value="<?php echo lang('news_action_publish'); ?>" />
+            </div>
+            <div class="span3">
+                <?php if(! $new): ?>
+                    <?php echo anchor(SITE_AREA .'/content/news/revisions/'.$news->id, lang('news_action_revisions'), 'class="btn btn-info"'); ?>
+                <?php endif; ?>
+                <?php echo anchor(SITE_AREA .'/content/news', lang('news_action_cancel'), 'class="btn btn-warning"'); ?>
+                <?php if(! $new): ?>
+                    <a class="btn btn-danger" href="<?php echo site_url(SITE_AREA.'/content/news/delete/'.$news->id); ?>" onclick="return confirm('<?php echo lang('news_action_delete_confirm'); ?>')"><?php echo lang('news_action_delete') ?></a>
+                <?php endif;?>
+            </div>
         </div>
         <fieldset>
             <legend><?php echo lang('news_heading_additional'); ?></legend>
