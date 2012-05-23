@@ -1,4 +1,31 @@
 <?php if (!defined('BASEPATH')) exit('No direct script access allowed');
+/*
+ * Copyright (c) 2011 Jakob Gillich
+ * 
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are
+ * met:
+ * 
+ * * Redistributions of source code must retain the above copyright
+ *   notice, this list of conditions and the following disclaimer.
+ * * Redistributions in binary form must reproduce the above
+ *   copyright notice, this list of conditions and the following disclaimer
+ *   in the documentation and/or other materials provided with the
+ *   distribution.
+ * 
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+ * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+ * OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+ * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+ * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * 
+ */
 
 class content extends Admin_Controller {
 
@@ -17,6 +44,7 @@ class content extends Admin_Controller {
     /**
      * Display news overview
      *
+     * @param int $page The page to display.
      * @return void
      */
     public function index($page = 0)
@@ -212,6 +240,7 @@ class content extends Admin_Controller {
     /**
      * Delete a news
      *
+     * @param int $id   The news ID.
      * @return void
      */
     public function delete($id = FALSE)
@@ -234,7 +263,8 @@ class content extends Admin_Controller {
     /*
      * Display all revisions of a news
      * 
-     * @param int $id The News ID.
+     * @param int $id   The News ID.
+     * @return void
      */
     public function revisions($id = FALSE)
     {
@@ -272,7 +302,8 @@ class content extends Admin_Controller {
     /**
      * Restore a revision
      * 
-     * @param int $id The Revision ID. 
+     * @param int $id   The Revision ID.
+     * @return void
      */
     
     public function restore_revision($id)
@@ -314,9 +345,11 @@ class content extends Admin_Controller {
     /**
      * Save news to database
      *
-     * @return bool
+     * @param string $type  Insert or update?
+     * @param int $id       If update, the news ID.
+     * @return bool         TRUE for success, FALSE for fail.
      */
-    private function _save_news($type='insert', $id = 0, $data = NULL)
+    private function _save_news($type='insert', $id = 0)
     {
         $this->form_validation->set_rules('news_title','Title','required|max_length[255]');
         $this->form_validation->set_rules('category','Category','required|integer|max_length[11]');
@@ -385,8 +418,8 @@ class content extends Admin_Controller {
      * Save selected changes to database
      * 
      * @param string $type  Possible: publish, unpublish, delete, purge
-     * @param array $ids    The News Ids.
-     * @return bool
+     * @param array $ids    The News IDs.
+     * @return bool         TRUE if success, FALSE if fail.
      */
     private function _save_selected_news($type, $ids)
     {

@@ -1,5 +1,31 @@
 <?php if (!defined('BASEPATH')) exit('No direct script access allowed');
-
+/*
+ * Copyright (c) 2011 Jakob Gillich
+ * 
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are
+ * met:
+ * 
+ * * Redistributions of source code must retain the above copyright
+ *   notice, this list of conditions and the following disclaimer.
+ * * Redistributions in binary form must reproduce the above
+ *   copyright notice, this list of conditions and the following disclaimer
+ *   in the documentation and/or other materials provided with the
+ *   distribution.
+ * 
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+ * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+ * OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+ * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+ * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * 
+ */
 class news extends Front_Controller {
 
     public function __construct() 
@@ -15,6 +41,7 @@ class news extends Front_Controller {
     /**
      * Display paginated news list
      *
+     * @param int $page The page.
      * @return void
      */
     public function index($page = 0)
@@ -40,7 +67,7 @@ class news extends Front_Controller {
     /**
      * View a news
      *
-     * @param string $slug
+     * @param string $slug  The slug.
      * @return void
      */
     public function view($slug = FALSE)
@@ -61,7 +88,8 @@ class news extends Front_Controller {
     /**
      * Display all News of a specific category
      * 
-     * @param string category slug
+     * @param string $slug  The category slug.
+     * @param int $page     The page.
      * @return void 
      */
     public function category($slug = FALSE, $page = 0)
@@ -96,7 +124,7 @@ class news extends Front_Controller {
     /**
      * Generate a RSS 2.0 Feed
      *
-     * @param string $options
+     * @param string $options   Special options.
      * @return void
      */
     public function feed($options = FALSE)
@@ -128,9 +156,9 @@ class news extends Front_Controller {
     }
     
     /**
-     * Returns config array
+     * Returns the news config array
      * 
-     * @return array
+     * @return array    The config array.
      */
     private function _get_config()
     {
@@ -146,7 +174,7 @@ class news extends Front_Controller {
     /**
      * Returns an pagination class config array suitable for the bootstrap framework
      * 
-     * @return array The config Array. 
+     * @return array    The config Array. 
      */
     private function _bootstrap_pagination_config()
     {
